@@ -1,26 +1,80 @@
 import React, { Component } from 'react';
+import Room from './components/room';
 import logo from './logo.svg';
 import './App.css';
+import { Route , } from "react-router-dom";
+import Messages from './components/messages';
+import {getRoom} from "./components/webApi";
+import {getText} from "./components/webApi";
+
+
 
 class App extends Component {
+
+  constructor(props){
+    super(props);
+    this.state = {
+      'rooms':[
+
+        ],
+        'roomsId':[
+
+        ],
+        'messages':[
+            'hello',
+            'hi',
+            'good morning',
+        ],
+        'actualId':null
+    }
+  }
+
+
+  componentDidMount(){
+      let newActualId = this.state.actualId;
+      getRoom()
+          .then((rooms) => {
+            this.setState({rooms:rooms.map(elem => elem.room_name) , roomsId:rooms.map(elem => elem.id)});
+          })
+
+  }
+
+
+
+  getMessages = (id = null) => {
+      getText(id)
+          .then((messages) => {
+              console.log(messages);
+              this.setState({messages:messages.map((elem) => elem)});
+          })
+  }
+
   render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      let newArr = [...this.state.roomsId];
+      // let getMessages = () => {
+      //     return(
+      //       <Messages allMessages={this.state.messages}  />
+      //     )
+      // }
+
+      let allRoutes = newArr.map((elem , index) => {
+
+          return (
+              <Route
+                key={index}
+                path={`/room${elem}`}
+                render={()=> <Messages id={elem} setParentState={this.setParentState}  allMessages={this.state.messages}/>}
+              />)
+      })
+
+      return (
+          <div className="container">
+
+            <div className="col-xs-12 col-md-6">
+                <Room rooms={this.state.rooms} id={this.state.roomsId} />
+                {allRoutes}
+            </div>
+          </div>
     );
   }
 }
