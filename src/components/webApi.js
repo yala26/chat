@@ -25,6 +25,26 @@ export function getText(id){
     })
 }
 
+export function addMessage(message , room , id){
+    return new Promise((resolve,reject) => {
+
+        let jsonText = JSON.stringify(
+            {
+                message:message,
+                room:room,
+                id:id,
+            }
+        )
+        let req = new XMLHttpRequest();
+        req.onload = () => {resolve()};
+        req.responseType = "json";
+        req.open('post' , `http://yii2/basic/web/chat/add_message`);
+        req.setRequestHeader('Content-Type' , 'application/json');
+        req.send(jsonText);
+
+    })
+}
+
 // addNotes = () => {
 //     let jsonFile = JSON.stringify(
 //         {

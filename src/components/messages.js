@@ -1,27 +1,48 @@
-import React from 'react';
+import React, {Component, PureComponent} from 'react';
 import {getText} from "./webApi";
+import PostMessages from "./postMessages";
 
-let Messages = ({id, allMessages}) => {
+class Messages extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            'messages': [],
 
+        }
+    }
 
-    let buff = getText(id)
-        .then((messages) => {
-           return messages;
+    componentWillMount() {
+        console.log(this.props.id);
+        getText(this.props.id)
+            .then((messages) => {
+                this.setState({messages: messages.map(elem => elem)});
+            })
+    }
+
+    changeState = (newMessage) => {
+        let newArr = [...this.state.messages , newMessage];
+        this.setState({messages:newArr.map(elem => elem)});
+    }
+
+    render() {
+        let newArr = [...this.state.messages];
+        let getMessages = newArr.map((elem, index) => {
+            return (
+                <li className="list-group-item" key={index}>{elem}</li>
+            )
         })
-
-    console.log(buff);
-
-    let getMessages = allMessages.map((elem, index) => {
         return (
-            <li key={index}>{elem}</li>
-        )
-    })
+            <div className="col-xs-12">
+                <ul className="list-group">
+                    {getMessages}
+                </ul>
+                <PostMessages room={this.props.room} id={this.props.id} changeState={this.changeState} />
+            </div>
 
-    return (
-        <ul>
-            {getMessages}
-        </ul>
-    )
+        )
+    }
 }
 
 export default Messages;
+
+
